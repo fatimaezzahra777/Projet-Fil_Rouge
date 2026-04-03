@@ -37,7 +37,8 @@ class MedecinController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $medecin = Medecin::with('user')->findOrFail($id);
+        return view('medecins.show', compact('medecin'));
     }
 
     /**
@@ -53,7 +54,10 @@ class MedecinController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $medecin = Medecin::findOrFail($id);
+        $medecin->update(['is_validated' => true]);
+
+        return back()->with('success', 'Médecin validé');
     }
 
     /**
