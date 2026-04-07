@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.tag {
+  @apply px-4 py-2 border border-[#D9E8E0] rounded-full text-sm text-tm bg-white cursor-pointer transition;
+}
+.tag.selected {
+  @apply bg-gm text-white border-gm;
+}
