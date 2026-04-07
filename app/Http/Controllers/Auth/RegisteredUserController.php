@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -49,8 +50,14 @@ class RegisteredUserController extends Controller
             'ville' => $request->ville,
             'genre' => $request->genre,
             'date_naissance' => $request->date_naissance,
+            'role' => $request->role,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+        ]);
+
+        Role::firstOrCreate([
+            'name' => $request->role,
+            'guard_name' => 'web',
         ]);
 
         $user->assignRole($request->role);
