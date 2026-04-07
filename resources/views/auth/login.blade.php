@@ -1,47 +1,75 @@
-<x-guest-layout>
-    <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Second Chance</title>
+    @vite('resources/css/app.css')
+</head>
+<body class="flex min-h-screen bg-gd font-sans">
 
-    <form method="POST" action="{{ route('login') }}">
+<!-- LEFT -->
+<div class="hidden md:flex w-1/2 bg-gdp relative p-16 flex-col justify-end">
+
+    <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773"
+         class="absolute inset-0 w-full h-full object-cover opacity-30"/>
+
+    <div class="relative z-10 text-white">
+
+        <h1 class="text-4xl font-bold mb-4">
+            Chaque jour est une 
+            <span class="text-gl">nouvelle chance</span>
+        </h1>
+
+        <p class="text-sm text-white/60 mb-6">
+            Rejoignez notre communauté solidaire
+        </p>
+
+        <div class="flex gap-8">
+            <div>
+                <div class="text-gl text-xl font-bold">500+</div>
+                <div class="text-xs text-white/40">Patients</div>
+            </div>
+            <div>
+                <div class="text-gl text-xl font-bold">80+</div>
+                <div class="text-xs text-white/40">Médecins</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- RIGHT -->
+<div class="w-full md:w-1/2 bg-cr flex items-center justify-center p-10">
+
+<div class="w-full max-w-md">
+
+    <h2 class="text-2xl font-bold text-td mb-2">Connexion</h2>
+    <p class="text-sm text-tm mb-6">Accédez à votre espace</p>
+
+    <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
 
-        <!-- Email Address -->
-        <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
-        </div>
+        <input type="email" name="email"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gl outline-none"
+            placeholder="Email">
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
+        <input type="password" name="password"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gl outline-none"
+            placeholder="Mot de passe">
 
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="current-password" />
+       
+         <button class="w-full bg-gm text-white py-3 rounded-full font-semibold hover:bg-gl hover:text-gd transition">
+            Se connecter →
+        </button>
 
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
-        </div>
-
-        <!-- Remember Me -->
-        <div class="block mt-4">
-            <label for="remember_me" class="inline-flex items-center">
-                <input id="remember_me" type="checkbox" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" name="remember">
-                <span class="ms-2 text-sm text-gray-600">{{ __('Remember me') }}</span>
-            </label>
-        </div>
-
-        <div class="flex items-center justify-end mt-4">
-            @if (Route::has('password.request'))
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('password.request') }}">
-                    {{ __('Forgot your password?') }}
-                </a>
-            @endif
-
-            <x-primary-button class="ms-3">
-                {{ __('Log in') }}
-            </x-primary-button>
-        </div>
     </form>
-</x-guest-layout>
+
+    <a href="{{ route('register') }}"><button class="w-full bg-white text-gd py-3 rounded-full font-semibold  transition">
+            S'inscrire →
+        </button></a>
+
+</div>
+</div>
+
+</body>
+</html>
