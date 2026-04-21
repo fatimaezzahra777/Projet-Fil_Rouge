@@ -1,6 +1,27 @@
 const registerForm = document.getElementById('registerForm');
 
 if (registerForm) {
+    const checkIcon = `
+        <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"></path>
+        </svg>
+    `;
+    const crossIcon = `
+        <svg viewBox="0 0 24 24" class="h-4 w-4 fill-current" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4l5.6 5.6L5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6z"></path>
+        </svg>
+    `;
+    const eyeIcon = `
+        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 5c-5 0-9.3 3.1-11 7 1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7m0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8m0-6.4A2.4 2.4 0 1 0 12 14a2.4 2.4 0 0 0 0-4.4"></path>
+        </svg>
+    `;
+    const eyeOffIcon = `
+        <svg viewBox="0 0 24 24" class="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 5c-5 0-9.3 3.1-11 7 1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7m0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8"></path>
+            <path d="M4 3.6 20.4 20 19 21.4 2.6 5z"></path>
+        </svg>
+    `;
     const panels = Array.from(document.querySelectorAll('.panel'));
     const roleInput = document.getElementById('roleInput');
     const roleCards = Array.from(document.querySelectorAll('.role-card'));
@@ -18,7 +39,7 @@ if (registerForm) {
 
             if (i < step) {
                 circle.className = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#4CAF7D] text-[0.87rem] font-bold text-white transition-all';
-                circle.textContent = '✓';
+                circle.innerHTML = checkIcon;
                 label.className = 'hidden text-[0.78rem] font-semibold text-[#3A5A52] sm:inline';
             } else if (i === step) {
                 circle.className = 'flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#235347] text-[0.87rem] font-bold text-white shadow-[0_0_0_4px_rgba(35,83,71,0.2)] transition-all';
@@ -99,8 +120,15 @@ if (registerForm) {
 
     const togglePassword = (inputId) => {
         const input = document.getElementById(inputId);
+        const button = document.querySelector(`[data-toggle-password="${inputId}"]`);
+
         if (input) {
             input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        const icon = button?.querySelector('.password-toggle-icon');
+        if (icon && input) {
+            icon.innerHTML = input.type === 'password' ? eyeIcon : eyeOffIcon;
         }
     };
 
@@ -131,8 +159,12 @@ if (registerForm) {
         Object.entries(rules).forEach(([key, ok]) => {
             const el = document.getElementById(`r-${key}`);
             if (el) {
-                el.textContent = `${ok ? '✓' : '✗'} ${el.textContent.slice(2)}`;
-                el.className = ok ? 'text-xs text-[#4CAF7D]' : 'text-xs text-[#7A9E93]';
+                const label = el.dataset.ruleLabel || '';
+                el.innerHTML = `
+                    <span class="rule-icon ${ok ? 'text-[#4CAF7D]' : 'text-[#7A9E93]'}">${ok ? checkIcon : crossIcon}</span>
+                    <span>${label}</span>
+                `;
+                el.className = ok ? 'flex items-center gap-2 text-xs text-[#4CAF7D]' : 'flex items-center gap-2 text-xs text-[#7A9E93]';
             }
         });
     };
@@ -168,9 +200,49 @@ if (registerForm) {
 
     document.querySelectorAll('.tag-btn').forEach((button) => {
         button.addEventListener('click', () => {
-            button.classList.toggle('border-[#235347]');
-            button.classList.toggle('bg-[#235347]');
-            button.classList.toggle('text-white');
+            const group = button.dataset.tagGroup;
+            const hiddenInput = document.getElementById(button.dataset.tagTarget || '');
+            const value = button.dataset.tagValue;
+
+            if (!group || !hiddenInput || !value) {
+                button.classList.toggle('border-[#235347]');
+                button.classList.toggle('bg-[#235347]');
+                button.classList.toggle('text-white');
+                return;
+            }
+
+            if (group === 'patient') {
+                const values = hiddenInput.value
+                    .split(',')
+                    .map((item) => item.trim())
+                    .filter(Boolean);
+                const index = values.indexOf(value);
+
+                if (index >= 0) {
+                    values.splice(index, 1);
+                } else {
+                    values.push(value);
+                }
+
+                hiddenInput.value = values.join(', ');
+                button.classList.toggle('border-[#235347]', index < 0);
+                button.classList.toggle('bg-[#235347]', index < 0);
+                button.classList.toggle('text-white', index < 0);
+                button.classList.toggle('border-[#D9E8E0]', index >= 0);
+                button.classList.toggle('text-[#3A5A52]', index >= 0);
+                return;
+            }
+
+            if (group === 'medecin') {
+                document.querySelectorAll('[data-tag-group="medecin"]').forEach((tagButton) => {
+                    tagButton.classList.remove('border-[#235347]', 'bg-[#235347]', 'text-white');
+                    tagButton.classList.add('border-[#D9E8E0]', 'text-[#3A5A52]');
+                });
+
+                hiddenInput.value = value;
+                button.classList.remove('border-[#D9E8E0]', 'text-[#3A5A52]');
+                button.classList.add('border-[#235347]', 'bg-[#235347]', 'text-white');
+            }
         });
     });
 
