@@ -1,59 +1,211 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Second Chance
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Second Chance est une application web Laravel destinée à accompagner des patients dans un parcours de suivi, avec des médecins, des associations et un espace d'administration.
 
-## About Laravel
+Le projet permet de gérer les rendez-vous médicaux, les activités associatives, les participations, les messages, les notifications et un système de points lié au parcours des patients et des médecins.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Fonctionnalités
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- Authentification classique avec Laravel Breeze.
+- Connexion Google via Laravel Socialite.
+- Gestion des rôles avec Spatie Laravel Permission : `patient`, `medecin`, `association`, `admin`.
+- Tableau de bord adapté selon le rôle connecté.
+- Gestion des rendez-vous entre patients et médecins.
+- Validation des rendez-vous, envoi d'e-mail de confirmation et attribution/dépense de points.
+- Gestion des activités créées par les associations.
+- Demandes de participation aux activités par les patients.
+- Notifications lors de la création de nouvelles activités.
+- Messagerie entre patients et associations.
+- Gestion des profils patients, médecins et associations.
+- Espace admin avec suivi des utilisateurs et validations en attente.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Stack technique
 
-## Learning Laravel
+- PHP 8.2+
+- Laravel 12
+- Laravel Breeze
+- Laravel Sanctum
+- Laravel Socialite
+- Laravel Reverb
+- Spatie Laravel Permission
+- Pest / PHPUnit
+- Vite
+- Tailwind CSS
+- Alpine.js
+- SQLite par défaut, configurable vers MySQL ou un autre SGBD supporté par Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Installation
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+Clonez le projet puis installez les dépendances :
 
-## Laravel Sponsors
+```bash
+composer install
+npm install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Créez le fichier d'environnement :
 
-### Premium Partners
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Si vous utilisez SQLite, créez le fichier de base de données :
 
-## Contributing
+```bash
+touch database/database.sqlite
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Lancez les migrations et le seeder admin :
 
-## Code of Conduct
+```bash
+php artisan migrate --seed
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Compilez les assets :
 
-## Security Vulnerabilities
+```bash
+npm run build
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Configuration `.env`
 
-## License
+Exemple de configuration minimale :
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```env
+APP_NAME="Second Chance"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://127.0.0.1:8000
+
+DB_CONNECTION=sqlite
+
+SESSION_DRIVER=database
+QUEUE_CONNECTION=database
+MAIL_MAILER=log
+```
+
+Le seeder `AdminUserSeeder` utilise ces variables pour créer ou mettre à jour le compte administrateur :
+
+```env
+ADMIN_EMAIL=admin@example.com
+ADMIN_NOM=Admin
+ADMIN_PRENOM=SecondChance
+ADMIN_TELEPHONE=0600000000
+ADMIN_VILLE=Casablanca
+ADMIN_GENRE=Homme
+ADMIN_PASSWORD=password
+```
+
+Pour activer la connexion Google, ajoutez aussi :
+
+```env
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/auth/google/callback
+```
+
+## Lancement en développement
+
+Vous pouvez lancer Laravel et Vite séparément :
+
+```bash
+php artisan serve
+npm run dev
+```
+
+Ou utiliser le script Composer qui démarre le serveur, la queue, les logs et Vite :
+
+```bash
+composer run dev
+```
+
+L'application sera généralement disponible sur :
+
+```text
+http://127.0.0.1:8000
+```
+
+## Commandes utiles
+
+```bash
+php artisan migrate
+php artisan migrate:fresh --seed
+php artisan queue:listen
+php artisan test
+npm run dev
+npm run build
+```
+
+Le projet définit aussi un script de setup complet :
+
+```bash
+composer run setup
+```
+
+## Structure principale
+
+- `app/Http/Controllers` : contrôleurs Laravel.
+- `app/Models` : modèles Eloquent.
+- `app/Repositories` : abstraction d'accès aux rendez-vous.
+- `app/Notifications` : notifications de l'application.
+- `app/Mail` : e-mails envoyés par l'application.
+- `database/migrations` : structure de la base de données.
+- `database/seeders` : données initiales, dont le compte admin.
+- `resources/views` : vues Blade.
+- `resources/js` : scripts front-end.
+- `resources/css` : styles de l'application.
+- `routes/web.php` : routes web principales.
+- `routes/auth.php` : routes d'authentification.
+
+## Rôles
+
+### Patient
+
+- Consulte son tableau de bord.
+- Recherche les médecins validés.
+- Demande des rendez-vous.
+- Participe aux activités associatives.
+- Consulte ses points, transactions, notifications et messages.
+
+### Médecin
+
+- Consulte et gère ses rendez-vous.
+- Confirme ou annule les demandes.
+- Définit le coût en points d'un rendez-vous.
+- Gagne des points lors des rendez-vous confirmés.
+
+### Association
+
+- Crée des activités.
+- Consulte les demandes de participation.
+- Accepte ou refuse les participations.
+- Echange des messages avec les patients.
+
+### Admin
+
+- Consulte les statistiques globales.
+- Suit les utilisateurs récents.
+- Gère les médecins et associations en attente de validation.
+- Peut accéder aux ressources principales de gestion.
+
+## Tests
+
+Pour lancer la suite de tests :
+
+```bash
+php artisan test
+```
+
+Ou via Composer :
+
+```bash
+composer run test
+```
+
+## Notes
+
+- Les e-mails sont configurés en `log` par défaut dans `.env.example`.
+- Les notifications Laravel utilisent la table `notifications`.
+- Les files d'attente utilisent la base de données par défaut avec `QUEUE_CONNECTION=database`.
+- Après modification des assets front-end, lancez `npm run dev` en développement ou `npm run build` avant un déploiement.
