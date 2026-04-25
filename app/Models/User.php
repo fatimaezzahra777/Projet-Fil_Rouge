@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
@@ -26,7 +27,11 @@ class User extends Authenticatable
         'date_naissance',
         'ville',
         'genre',
+        'role',
         'email',
+        'google_id',
+        'google_avatar',
+        'email_verified_at',
         'password',
     ];
 
@@ -66,5 +71,15 @@ class User extends Authenticatable
     public function association()
     {
         return $this->hasOne(Association::class);
+    }
+
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
+    public function receivedMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'receiver_id');
     }
 }
