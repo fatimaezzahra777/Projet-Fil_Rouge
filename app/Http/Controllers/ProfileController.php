@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Association;
+use App\Models\Medecin;
+use App\Models\Patient;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +20,7 @@ class ProfileController extends Controller
     public function edit(Request $request): View
     {
         return view('profile.edit', [
-            'user' => $request->user(),
+            'user' => $request->user()->load(['patient', 'medecin', 'association']),
         ]);
     }
 
@@ -26,13 +29,55 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user()->load(['patient', 'medecin', 'association']);
+        $validated = $request->validated();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $user->fill([
+            'nom' => $validated['nom'],
+            'prenom' => $validated['prenom'],
+            'telephone' => $validated['telephone'] ?? null,
+            'ville' => $validated['ville'] ?? null,
+            'genre' => $validated['genre'] ?? null,
+            'date_naissance' => $validated['date_naissance'] ?? null,
+            'email' => $validated['email'],
+        ]);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $user->save();
+
+        if ($user->hasRole('patient')) {
+            Patient::query()->firstOrCreate(
+                ['user_id' => $user->id],
+                ['type_addiction' => $validated['type_addiction'] ?? null]
+            )->update([
+                'type_addiction' => $validated['type_addiction'] ?? null,
+            ]);
+        }
+
+        if ($user->hasRole('medecin')) {
+            Medecin::query()->firstOrCreate(
+                ['user_id' => $user->id],
+                ['specialite' => $validated['specialite'] ?? null]
+            )->update([
+                'specialite' => $validated['specialite'] ?? null,
+            ]);
+        }
+
+        if ($user->hasRole('association')) {
+            Association::query()->firstOrCreate(
+                ['user_id' => $user->id],
+                [
+                    'nom' => $validated['association_nom'] ?? trim(($user->prenom ?? '') . ' ' . ($user->nom ?? '')),
+                    'description' => $validated['association_description'] ?? null,
+                ]
+            )->update([
+                'nom' => $validated['association_nom'] ?? trim(($user->prenom ?? '') . ' ' . ($user->nom ?? '')),
+                'description' => $validated['association_description'] ?? null,
+            ]);
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
