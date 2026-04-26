@@ -8,7 +8,8 @@ class Association extends Model
 {
     protected $fillable = [
         'user_id',
-        'specialite',
+        'nom',
+        'description',
         'is_validated'
     ];
 
@@ -17,8 +18,8 @@ class Association extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function rendezVous()
+    public function activites()
     {
-        return $this->hasMany(RendezVous::class);
+        return $this->hasMany(Activite::class);
     }
 }
