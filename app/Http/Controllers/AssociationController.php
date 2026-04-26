@@ -9,9 +9,12 @@ class AssociationController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * Est une function pour returner le view association index si le role association 
      */
     public function index()
     {
+        abort_unless(auth()->user()?->hasRole('admin'), 403);
+
         $associations = Association::with('user')->get();
         return view('associations.index', compact('associations'));
     }
@@ -37,6 +40,8 @@ class AssociationController extends Controller
      */
     public function show(string $id)
     {
+        abort_unless(auth()->user()?->hasRole('admin'), 403);
+
         $association = Association::with('user')->findOrFail($id);
         return view('associations.show', compact('association'));
     }
@@ -54,6 +59,8 @@ class AssociationController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        abort_unless(auth()->user()?->hasRole('admin'), 403);
+
         $association = Association::findOrFail($id);
         $association->update(['is_validated' => true]);
 
