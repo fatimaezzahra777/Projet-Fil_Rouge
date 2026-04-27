@@ -17,5 +17,21 @@ export default {
         },
     },
 
+    theme: {
+        extend: {
+            colors: {
+            gd: '#051F20',
+            gdp: '#0B2B26',
+            gdk: '#163832',
+            gm: '#235347',
+            gl: '#8EB69B',
+            gp: '#DAF1DE',
+            cr: '#F7F5F0',
+            td: '#0D1F1E',
+            tm: '#3A5A52',
+            }
+        }
+        },
+
     plugins: [forms],
 };
