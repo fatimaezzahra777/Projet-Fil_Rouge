@@ -1,6 +1,26 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body.app-shell {
+    font-family: 'DM Sans', sans-serif;
+    color: #0D1F1E;
+    background: #F4F7F5;
+  }
+}
+
+@layer components {
+  .font-display {
+    font-family: 'Playfair Display', serif;
+  }
+
+  [data-active="true"],
+  .nav-link-active {
+    @apply text-[#235347];
+  }
+}
+
 .tag {
   @apply px-4 py-2 border border-[#D9E8E0] rounded-full text-sm text-tm bg-white cursor-pointer transition;
 }

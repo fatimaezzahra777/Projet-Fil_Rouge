@@ -29,7 +29,11 @@
     </style>
 </head>
 <body>
-@php $user = auth()->user(); @endphp
+@php
+    $user = auth()->user();
+    $appointmentCost = $rendezVous->points_cost ?? \App\Models\RendezVous::DEFAULT_POINTS_COST;
+    $doctorCosts = ($doctorCosts ?? collect())->toArray();
+@endphp
 <div class="wrap">
     <div class="card">
         <h1>Modifier le rendez-vous</h1>
@@ -66,7 +70,7 @@
                 <label for="medecin_id">Medecin</label>
                 <select id="medecin_id" name="medecin_id">
                     @foreach ($medecins as $medecin)
-                        <option value="{{ $medecin->id }}" @selected(old('medecin_id', $rendezVous->medecin_id) == $medecin->id)>
+                        <option value="{{ $medecin->id }}" data-points-cost="{{ $doctorCosts[$medecin->id] ?? \App\Models\RendezVous::DEFAULT_POINTS_COST }}" @selected(old('medecin_id', $rendezVous->medecin_id) == $medecin->id)>
                             Dr. {{ $medecin->user?->prenom }} {{ $medecin->user?->nom }} - {{ $medecin->specialite }}
                         </option>
                     @endforeach
@@ -93,6 +97,11 @@
                 </select>
             </div>
 
+            <div class="field">
+                <label for="points_cost">Points utilises pour ce rendez-vous</label>
+                <input id="points_cost" type="number" value="{{ $appointmentCost }}" readonly>
+            </div>
+
             <div class="actions">
                 <a href="{{ route('rendezvous.index') }}" class="btn btn-outline">Retour</a>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -100,5 +109,14 @@
         </form>
     </div>
 </div>
+<script>
+    const medecinSelect = document.getElementById('medecin_id');
+    const pointsCostInput = document.getElementById('points_cost');
+
+    medecinSelect?.addEventListener('change', () => {
+        const selectedOption = medecinSelect.options[medecinSelect.selectedIndex];
+        pointsCostInput.value = selectedOption?.dataset.pointsCost || '{{ \App\Models\RendezVous::DEFAULT_POINTS_COST }}';
+    });
+</script>
 </body>
 </html>

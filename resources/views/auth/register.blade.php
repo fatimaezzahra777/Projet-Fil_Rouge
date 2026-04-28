@@ -15,19 +15,19 @@
         $roles = [
             [
                 'key' => 'patient',
-                'emoji' => '🙋',
+                'emoji' => '',
                 'title' => 'Patient',
                 'desc' => 'Je cherche un accompagnement medical et social pour surmonter mon addiction.',
             ],
             [
                 'key' => 'medecin',
-                'emoji' => '👨‍⚕️',
+                'emoji' => '',
                 'title' => 'Medecin / Psychologue',
                 'desc' => 'Je suis professionnel de sante et je souhaite aider des patients.',
             ],
             [
                 'key' => 'association',
-                'emoji' => '🤝',
+                'emoji' => '',
                 'title' => 'Association',
                 'desc' => 'Nous organisons des activites et ateliers de soutien communautaire.',
             ],
@@ -35,6 +35,13 @@
 
         $cities = ['Casablanca', 'Rabat', 'Marrakech', 'Fes', 'Tanger', 'Kenitra', 'Autre'];
         $selectedRole = old('role', 'patient');
+        $selectedAddictions = array_filter(array_map('trim', explode(',', old('type_addiction', ''))));
+
+        $checkIcon = '<svg viewBox="0 0 24 24" class="h-3.5 w-3.5 fill-current" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/></svg>';
+        $documentIcon = '<svg viewBox="0 0 24 24" class="h-8 w-8 fill-[#235347]" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm0 2.5L18.5 9H14zM8 13h8v2H8zm0 4h8v2H8zm0-8h4v2H8z"/></svg>';
+        $clipboardIcon = '<svg viewBox="0 0 24 24" class="h-8 w-8 fill-[#235347]" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19 3h-3.2A3 3 0 0 0 13 1h-2a3 3 0 0 0-2.8 2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2M12 3a1 1 0 0 1 1 1h-2a1 1 0 0 1 1-1m5 16H7V5h2v2h6V5h2zM9 10h6v2H9zm0 4h6v2H9z"/></svg>';
+        $eyeIcon = '<svg viewBox="0 0 24 24" class="h-5 w-5 fill-current" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 5c-5 0-9.3 3.1-11 7 1.7 3.9 6 7 11 7s9.3-3.1 11-7c-1.7-3.9-6-7-11-7m0 11a4 4 0 1 1 0-8 4 4 0 0 1 0 8m0-6.4A2.4 2.4 0 1 0 12 14a2.4 2.4 0 0 0 0-4.4"/></svg>';
+        $crossIcon = '<svg viewBox="0 0 24 24" class="h-3.5 w-3.5 fill-current" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M19 6.4 17.6 5 12 10.6 6.4 5 5 6.4l5.6 5.6L5 17.6 6.4 19l5.6-5.6 5.6 5.6 1.4-1.4-5.6-5.6z"/></svg>';
     @endphp
 
     <nav class="flex items-center justify-between bg-[#051F20] px-6 py-4 lg:px-14">
@@ -92,6 +99,22 @@
                 </div>
             @endif
 
+            <a href="{{ route('auth.google.redirect') }}" class="mb-6 flex w-full items-center justify-center gap-3 rounded-full border border-[#D9E8E0] bg-white px-4 py-3 text-sm font-semibold text-[#3A5A52] transition hover:border-[#235347] hover:text-[#235347]">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="h-5 w-5">
+                    <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12S17.4 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/>
+                    <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 18.9 12 24 12c3 0 5.7 1.1 7.8 3l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+                    <path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.3 0-9.8-3.3-11.5-8l-6.5 5C9.3 39.6 16.1 44 24 44z"/>
+                    <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.2-4.1 5.6l.1-.1 6.2 5.2C37 38.4 44 33 44 24c0-1.3-.1-2.3-.4-3.5z"/>
+                </svg>
+                S'inscrire avec Google
+            </a>
+
+            <div class="mb-6 flex items-center gap-3 text-xs text-[#7A9E93]">
+                <span class="h-px flex-1 bg-[#D9E8E0]"></span>
+                <span>ou avec email</span>
+                <span class="h-px flex-1 bg-[#D9E8E0]"></span>
+            </div>
+
             <form method="POST" action="{{ route('register') }}" id="registerForm" data-has-errors="{{ $errors->any() ? 'true' : 'false' }}" novalidate>
                 @csrf
                 <input type="hidden" name="role" id="roleInput" value="{{ $selectedRole }}">
@@ -110,7 +133,9 @@
                                 <span class="mb-3 block text-4xl">{{ $role['emoji'] }}</span>
                                 <span class="mb-1 block text-[0.95rem] font-bold text-[#0D1F1E]">{{ $role['title'] }}</span>
                                 <span class="block text-xs leading-5 text-[#7A9E93]">{{ $role['desc'] }}</span>
-                                <span class="{{ $selectedRole === $role['key'] ? 'flex' : 'hidden' }} role-check absolute right-3 top-3 h-6 w-6 items-center justify-center rounded-full bg-[#235347] text-xs font-bold text-white">✓</span>
+                                <span class="{{ $selectedRole === $role['key'] ? 'flex' : 'hidden' }} role-check absolute right-3 top-3 h-6 w-6 items-center justify-center rounded-full bg-[#235347] text-white">
+                                    {!! $checkIcon !!}
+                                </span>
                             </button>
                         @endforeach
                     </div>
@@ -209,9 +234,10 @@
                     <div id="patient-fields" class="{{ $selectedRole === 'patient' ? '' : 'hidden' }}">
                         <div class="mb-5">
                             <label class="mb-2 block text-sm font-semibold text-[#0D1F1E]">Type d'addiction concernee</label>
+                            <input type="hidden" name="type_addiction" id="patientTypeAddiction" value="{{ old('type_addiction') }}">
                             <div class="flex flex-wrap gap-2">
                                 @foreach (['Alcool', 'Tabac', 'Drogue', 'Jeux video', 'Jeux d argent', 'Reseaux sociaux', 'Alimentation', 'Autre'] as $tag)
-                                    <button type="button" class="tag-btn rounded-full border border-[#D9E8E0] px-4 py-2 text-xs text-[#3A5A52] transition hover:border-[#235347] hover:bg-[#DAF1DE]">
+                                    <button type="button" data-tag-group="patient" data-tag-target="patientTypeAddiction" data-tag-value="{{ $tag }}" class="tag-btn rounded-full border px-4 py-2 text-xs transition hover:border-[#235347] hover:bg-[#DAF1DE] {{ in_array($tag, $selectedAddictions, true) ? 'border-[#235347] bg-[#235347] text-white' : 'border-[#D9E8E0] text-[#3A5A52]' }}">
                                         {{ $tag }}
                                     </button>
                                 @endforeach
@@ -248,13 +274,17 @@
                     <div id="medecin-fields" class="{{ $selectedRole === 'medecin' ? '' : 'hidden' }}">
                         <div class="mb-5">
                             <label class="mb-2 block text-sm font-semibold text-[#0D1F1E]">Specialite</label>
+                            <input type="hidden" name="specialite" id="medecinSpecialite" value="{{ old('specialite') }}">
                             <div class="flex flex-wrap gap-2">
                                 @foreach (['Addictologie', 'Psychologie', 'Psychiatrie', 'Medecine generale', 'Sophrologie', 'Autre'] as $tag)
-                                    <button type="button" class="tag-btn rounded-full border border-[#D9E8E0] px-4 py-2 text-xs text-[#3A5A52] transition hover:border-[#235347] hover:bg-[#DAF1DE]">
+                                    <button type="button" data-tag-group="medecin" data-tag-target="medecinSpecialite" data-tag-value="{{ $tag }}" class="tag-btn rounded-full border px-4 py-2 text-xs transition hover:border-[#235347] hover:bg-[#DAF1DE] {{ old('specialite') === $tag ? 'border-[#235347] bg-[#235347] text-white' : 'border-[#D9E8E0] text-[#3A5A52]' }}">
                                         {{ $tag }}
                                     </button>
                                 @endforeach
                             </div>
+                            @error('specialite')
+                                <p class="mt-2 text-xs text-[#E05C5C]">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="grid gap-4 md:grid-cols-2">
@@ -273,8 +303,26 @@
                             </div>
                         </div>
 
+                        <div class="mb-5">
+                            <label for="appointment_points_cost" class="mb-2 block text-sm font-semibold text-[#0D1F1E]">Points par rendez-vous</label>
+                            <input
+                                id="appointment_points_cost"
+                                name="appointment_points_cost"
+                                type="number"
+                                min="1"
+                                step="1"
+                                value="{{ old('appointment_points_cost', \App\Models\Medecin::DEFAULT_APPOINTMENT_POINTS_COST) }}"
+                                class="@error('appointment_points_cost') border-[#E05C5C] @else border-[#D9E8E0] @enderror w-full rounded-[10px] border px-4 py-3 text-sm outline-none transition focus:border-[#8EB69B] focus:ring-4 focus:ring-[#8EB69B]/20"
+                                placeholder="{{ \App\Models\Medecin::DEFAULT_APPOINTMENT_POINTS_COST }}"
+                            >
+                            <p class="mt-2 text-xs text-[#7A9E93]">Ce nombre sera le cout demande au patient pour confirmer un rendez-vous avec ce medecin.</p>
+                            @error('appointment_points_cost')
+                                <p class="mt-2 text-xs text-[#E05C5C]">{{ $message }}</p>
+                            @enderror
+                        </div>
+
                         <div class="mb-5 rounded-xl border-2 border-dashed border-[#D9E8E0] bg-[#F4F7F5] px-6 py-8 text-center transition hover:border-[#235347] hover:bg-[#DAF1DE]">
-                            <div class="mb-2 text-3xl">📄</div>
+                            <div class="mb-2 flex justify-center">{!! $documentIcon !!}</div>
                             <p class="text-sm font-medium text-[#3A5A52]">Glisser votre document ici</p>
                             <p class="mt-1 text-xs text-[#7A9E93]">PDF, JPG, PNG · Max 5MB</p>
                         </div>
@@ -288,7 +336,7 @@
                     <div id="assoc-fields" class="{{ $selectedRole === 'association' ? '' : 'hidden' }}">
                         <div class="mb-5">
                             <label class="mb-2 block text-sm font-semibold text-[#0D1F1E]">Nom de l'association</label>
-                            <input type="text" class="w-full rounded-[10px] border border-[#D9E8E0] px-4 py-3 text-sm outline-none transition focus:border-[#8EB69B] focus:ring-4 focus:ring-[#8EB69B]/20" placeholder="Association Espoir Maroc">
+                            <input type="text" name="association_nom" value="{{ old('association_nom') }}" class="w-full rounded-[10px] border border-[#D9E8E0] px-4 py-3 text-sm outline-none transition focus:border-[#8EB69B] focus:ring-4 focus:ring-[#8EB69B]/20" placeholder="Association Espoir Maroc">
                         </div>
 
                         <div class="grid gap-4 md:grid-cols-2">
@@ -304,11 +352,11 @@
 
                         <div class="mb-5">
                             <label class="mb-2 block text-sm font-semibold text-[#0D1F1E]">Description des activites</label>
-                            <textarea rows="4" class="w-full rounded-[10px] border border-[#D9E8E0] px-4 py-3 text-sm outline-none transition focus:border-[#8EB69B] focus:ring-4 focus:ring-[#8EB69B]/20" placeholder="Decrivez vos missions et activites principales..."></textarea>
+                            <textarea name="association_description" rows="4" class="w-full rounded-[10px] border border-[#D9E8E0] px-4 py-3 text-sm outline-none transition focus:border-[#8EB69B] focus:ring-4 focus:ring-[#8EB69B]/20" placeholder="Decrivez vos missions et activites principales...">{{ old('association_description') }}</textarea>
                         </div>
 
                         <div class="mb-5 rounded-xl border-2 border-dashed border-[#D9E8E0] bg-[#F4F7F5] px-6 py-8 text-center transition hover:border-[#235347] hover:bg-[#DAF1DE]">
-                            <div class="mb-2 text-3xl">📋</div>
+                            <div class="mb-2 flex justify-center">{!! $clipboardIcon !!}</div>
                             <p class="text-sm font-medium text-[#3A5A52]">Deposer le recepisse officiel</p>
                             <p class="mt-1 text-xs text-[#7A9E93]">PDF, JPG, PNG · Max 5MB</p>
                         </div>
@@ -335,7 +383,9 @@
                                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
                             </svg>
                             <input id="password" name="password" type="password" placeholder="Minimum 8 caracteres" class="@error('password') border-[#E05C5C] @else border-[#D9E8E0] @enderror w-full rounded-[10px] border py-3 pl-11 pr-11 text-sm outline-none transition focus:border-[#8EB69B] focus:ring-4 focus:ring-[#8EB69B]/20">
-                            <button type="button" data-toggle-password="password" class="absolute right-4 top-1/2 -translate-y-1/2 text-[#7A9E93]">👁</button>
+                            <button type="button" data-toggle-password="password" class="absolute right-4 top-1/2 -translate-y-1/2 text-[#7A9E93]" aria-label="Afficher ou masquer le mot de passe">
+                                <span class="pointer-events-none password-toggle-icon">{!! $eyeIcon !!}</span>
+                            </button>
                         </div>
 
                         <div class="mt-3">
@@ -356,17 +406,31 @@
                                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
                             </svg>
                             <input id="password_confirmation" name="password_confirmation" type="password" placeholder="Repetez le mot de passe" class="w-full rounded-[10px] border border-[#D9E8E0] py-3 pl-11 pr-11 text-sm outline-none transition focus:border-[#8EB69B] focus:ring-4 focus:ring-[#8EB69B]/20">
-                            <button type="button" data-toggle-password="password_confirmation" class="absolute right-4 top-1/2 -translate-y-1/2 text-[#7A9E93]">👁</button>
+                            <button type="button" data-toggle-password="password_confirmation" class="absolute right-4 top-1/2 -translate-y-1/2 text-[#7A9E93]" aria-label="Afficher ou masquer la confirmation du mot de passe">
+                                <span class="pointer-events-none password-toggle-icon">{!! $eyeIcon !!}</span>
+                            </button>
                         </div>
                     </div>
 
                     <div class="mb-5 rounded-xl bg-[#DAF1DE] px-5 py-4">
                         <p class="mb-3 text-xs font-bold text-[#235347]">Le mot de passe doit contenir :</p>
                         <div class="grid gap-2 text-xs text-[#7A9E93] sm:grid-cols-2">
-                            <p id="r-len">✗ Au moins 8 caracteres</p>
-                            <p id="r-upper">✗ Une majuscule</p>
-                            <p id="r-num">✗ Un chiffre</p>
-                            <p id="r-spec">✗ Un caractere special</p>
+                            <p id="r-len" data-rule-label="Au moins 8 caracteres" class="flex items-center gap-2">
+                                <span class="rule-icon text-[#7A9E93]">{!! $crossIcon !!}</span>
+                                <span>Au moins 8 caracteres</span>
+                            </p>
+                            <p id="r-upper" data-rule-label="Une majuscule" class="flex items-center gap-2">
+                                <span class="rule-icon text-[#7A9E93]">{!! $crossIcon !!}</span>
+                                <span>Une majuscule</span>
+                            </p>
+                            <p id="r-num" data-rule-label="Un chiffre" class="flex items-center gap-2">
+                                <span class="rule-icon text-[#7A9E93]">{!! $crossIcon !!}</span>
+                                <span>Un chiffre</span>
+                            </p>
+                            <p id="r-spec" data-rule-label="Un caractere special" class="flex items-center gap-2">
+                                <span class="rule-icon text-[#7A9E93]">{!! $crossIcon !!}</span>
+                                <span>Un caractere special</span>
+                            </p>
                         </div>
                     </div>
 
@@ -397,7 +461,11 @@
 
                 <section id="p5" class="panel hidden">
                     <div class="py-4 text-center">
-                        <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#DAF1DE] text-4xl text-[#235347]">✓</div>
+                        <div class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#DAF1DE] text-[#235347]">
+                            <svg viewBox="0 0 24 24" class="h-10 w-10 fill-current" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <path d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+                            </svg>
+                        </div>
                         <h2 class="mb-3 font-['Playfair_Display'] text-3xl font-bold text-[#0D1F1E]">Confirmation</h2>
                         <p class="mx-auto mb-8 max-w-md text-sm leading-7 text-[#7A9E93]">Verifiez vos informations avant de creer votre compte. Apres l'inscription, vous serez redirige vers votre espace.</p>
 

@@ -23,7 +23,8 @@ class GoogleController extends Controller
 
     public function callback(): RedirectResponse
     {
-        $googleUser = Socialite::driver('google')->user();
+        
+        $googleUser = Socialite::driver('google')->stateless()->user();
 
         $user = DB::transaction(function () use ($googleUser) {
             $existingUser = User::where('google_id', $googleUser->getId())

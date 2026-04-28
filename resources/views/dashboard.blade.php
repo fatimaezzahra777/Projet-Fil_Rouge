@@ -15,31 +15,21 @@
     $user = $user ?? auth()->user();
     $initials = strtoupper(substr($user->prenom ?? '', 0, 1) . substr($user->nom ?? '', 0, 1));
     $todayLabel = now()->format('d/m/Y');
+    $patientNotifications = $patientNotifications ?? collect();
+    $patientUnreadNotifications = $patientUnreadNotifications ?? 0;
+    $doctorSearch = $doctorSearch ?? '';
+    $doctorResults = $doctorResults ?? collect();
 @endphp
 <div class="layout">
+    @if ($user->hasRole('patient'))
+        @include('partials.patient-sidebar', ['active' => 'dashboard'])
+    @else
     <aside class="sidebar">
         <a href="{{ route('dashboard') }}" class="sidebar-logo">
             <span class="sidebar-logo-text">Second<span>Chance</span></span>
         </a>
 
-        @if ($user->hasRole('patient'))
-            <span class="sidebar-section">Principal</span>
-            <a href="{{ route('dashboard') }}" class="sidebar-link active">
-                <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Tableau de bord
-            </a>
-            <a href="{{ route('rendezvous.index') }}" class="sidebar-link">
-                <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zm-7-7h-5v5h5v-5z"/></svg>Rendez-vous
-            </a>
-            <a href="{{ route('activites.index') }}" class="sidebar-link">
-                <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>Activites
-            </a>
-            <a href="{{ route('messages.index') }}" class="sidebar-link">
-                <svg viewBox="0 0 24 24"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>Messagerie
-            </a>
-            <a href="{{ route('patient.dossier') }}" class="sidebar-link">
-                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>Mon dossier
-            </a>
-        @elseif ($user->hasRole('medecin'))
+        @if ($user->hasRole('medecin'))
             <span class="sidebar-section">Medecin</span>
             <a href="{{ route('dashboard') }}" class="sidebar-link active">
                 <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>Tableau de bord
@@ -97,6 +87,7 @@
             </form>
         </div>
     </aside>
+    @endif
 
     <main class="main">
         @if (session('success'))
@@ -120,12 +111,6 @@
                     <div class="page-subtitle">Voici votre tableau de bord - {{ $todayLabel }}</div>
                 </div>
                 <div class="header-right">
-                    <button class="notif-btn" type="button" aria-label="Notifications">
-                        <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-                        @if (($patientStats['rendezvous_upcoming'] ?? 0) > 0)
-                            <span class="notif-dot"></span>
-                        @endif
-                    </button>
                     <a href="{{ route('rendezvous.create') }}" class="btn-primary">+ Rendez-vous</a>
                 </div>
             </div>
@@ -255,20 +240,85 @@
             <div class="bottom-grid">
                 <div class="card">
                     <div class="card-header">
-                        <span class="card-title">Messages recents</span>
-                        <a href="{{ route('messages.index') }}" class="card-action">Ouvrir -></a>
+                        <span class="card-title">Notifications</span>
+                        <span class="card-action">{{ $patientUnreadNotifications }} non lue(s)</span>
                     </div>
-                    @forelse ($patientMessages as $message)
+                    @forelse ($patientNotifications as $notification)
+                        @php
+                            $data = $notification->data;
+                        @endphp
                         <div class="msg-item">
-                            <div class="msg-avatar">{{ $message['initials'] }}</div>
+                            <div class="msg-avatar">{{ strtoupper(substr($data['association'] ?? 'A', 0, 2)) }}</div>
                             <div style="flex:1;min-width:0;">
-                                <div class="msg-name">{{ $message['name'] }}</div>
-                                <div class="msg-preview">{{ $message['preview'] }}</div>
+                                <div class="msg-name">{{ $data['association'] ?? 'Association' }}</div>
+                                <div class="msg-preview">
+                                    {{ $data['message'] ?? 'Nouvelle activite disponible.' }}
+                                    @if (!empty($data['date']))
+                                        · {{ \Illuminate\Support\Carbon::parse($data['date'])->format('d/m/Y') }}
+                                    @endif
+                                    @if (!empty($data['points']))
+                                        · +{{ $data['points'] }} pts
+                                    @endif
+                                </div>
                             </div>
-                            <span class="msg-time">{{ $message['time'] }}</span>
+                            <span class="msg-time">{{ $notification->created_at?->diffForHumans() }}</span>
                         </div>
                     @empty
-                        <div class="empty-state">La messagerie sera ajoutee dans une prochaine etape.</div>
+                        <div class="empty-state">Aucune notification pour le moment.</div>
+                    @endforelse
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Rechercher un medecin</span>
+                        <a href="{{ route('rendezvous.create') }}" class="card-action">Prendre rendez-vous -></a>
+                    </div>
+                    <form method="GET" action="{{ route('dashboard') }}" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+                        <input
+                            type="text"
+                            name="doctor_search"
+                            value="{{ $doctorSearch }}"
+                            placeholder="Nom, specialite, ville..."
+                            style="flex:1;min-width:220px;border:1px solid #d6e2db;border-radius:14px;padding:12px 14px;font:inherit;background:#fff;"
+                        >
+                        <button type="submit" class="btn-primary" style="border:none;">Rechercher</button>
+                    </form>
+                    @forelse ($doctorResults as $doctor)
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background:var(--gm);">
+                                <svg viewBox="0 0 24 24"><path d="M19 8h-4V4h-2v4H9v2h4v4h2v-4h4zM5 19h14v2H5z"/></svg>
+                            </div>
+                            <div style="flex:1;">
+                                <div class="activity-name">Dr. {{ $doctor->user?->prenom }} {{ $doctor->user?->nom }}</div>
+                                <div class="activity-meta">{{ $doctor->specialite ?: 'Consultation generale' }} · {{ $doctor->user?->ville ?: 'Ville non renseignee' }}</div>
+                            </div>
+                            <a href="{{ route('rendezvous.create', ['medecin_id' => $doctor->id]) }}" class="activity-pts" style="text-decoration:none;">Choisir</a>
+                        </div>
+                    @empty
+                        <div class="empty-state">
+                            {{ $doctorSearch ? 'Aucun medecin ne correspond a cette recherche.' : 'Aucun medecin valide disponible pour le moment.' }}
+                        </div>
+                    @endforelse
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span class="card-title">Top 3 medecins</span>
+                        <span class="card-action">Classement points</span>
+                    </div>
+                    @forelse ($topMedecins as $index => $doctor)
+                        <div class="activity-item">
+                            <div class="activity-icon" style="background:{{ $index === 0 ? '#D9A441' : ($index === 1 ? '#8E9AAF' : '#B9784D') }};">
+                                <span style="color:#fff;font-weight:800;">{{ $index + 1 }}</span>
+                            </div>
+                            <div style="flex:1;">
+                                <div class="activity-name">Dr. {{ $doctor->user?->prenom }} {{ $doctor->user?->nom }}</div>
+                                <div class="activity-meta">{{ $doctor->specialite ?: 'Consultation generale' }} · {{ $doctor->user?->ville ?: 'Ville non renseignee' }}</div>
+                            </div>
+                            <a href="{{ route('rendezvous.create', ['medecin_id' => $doctor->id]) }}" class="activity-pts" style="text-decoration:none;">{{ (int) ($doctor->points ?? 0) }} pts</a>
+                        </div>
+                    @empty
+                        <div class="empty-state">Le classement sera disponible apres les premiers rendez-vous confirmes.</div>
                     @endforelse
                 </div>
 
@@ -428,6 +478,20 @@
             <div class="stats-row">
                 <div class="stat-card">
                     <div class="stat-card-top">
+                        <span class="stat-badge sb-up">Prix</span>
+                    </div>
+                    <div class="stat-val">{{ $medecinStats['appointment_points_cost'] }}</div>
+                    <div class="stat-lbl">Points demandes par rendez-vous</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-top">
+                        <span class="stat-badge sb-up">Gagnes</span>
+                    </div>
+                    <div class="stat-val">{{ $medecinStats['earned_points'] }}</div>
+                    <div class="stat-lbl">Points gagnes automatiquement</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-top">
                         <span class="stat-badge sb-up">Planning</span>
                     </div>
                     <div class="stat-val">{{ $medecinStats['total'] }}</div>
@@ -453,6 +517,26 @@
                     </div>
                     <div class="stat-val">{{ $medecinStats['confirmed'] }}</div>
                     <div class="stat-lbl">Rendez-vous confirmes</div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom:24px;">
+                <div class="card-header">
+                    <span class="card-title">Points du rendez-vous</span>
+                    <span class="card-action">Modifiable</span>
+                </div>
+                <form method="POST" action="{{ route('medecins.appointment-cost.update') }}" style="display:grid;grid-template-columns:1fr auto;gap:14px;align-items:end;">
+                    @csrf
+                    @method('PATCH')
+                    <div>
+                        <label class="label" for="appointment_points_cost">Points demandes au patient</label>
+                        <input class="input" id="appointment_points_cost" name="appointment_points_cost" type="number" min="1" value="{{ old('appointment_points_cost', $medecinStats['appointment_points_cost']) }}">
+                        <p style="margin-top:8px;color:var(--tl);font-size:.82rem;">Cette valeur s'affiche dans le formulaire de prise de rendez-vous et sera depensee par le patient apres votre confirmation.</p>
+                    </div>
+                    <button type="submit" class="btn-primary">Modifier</button>
+                </form>
+                <div style="margin-top:16px;padding:14px 16px;border-radius:14px;background:#F4F7F5;color:var(--gm);font-size:.88rem;">
+                    Points gagnes par vos rendez-vous confirmes : <strong>{{ $medecinStats['earned_points'] }} pts</strong>. Cette valeur est calculee automatiquement et ne se modifie pas manuellement.
                 </div>
             </div>
 

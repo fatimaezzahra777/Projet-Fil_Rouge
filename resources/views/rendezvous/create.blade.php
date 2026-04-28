@@ -31,6 +31,11 @@
     </style>
 </head>
 <body>
+@php
+    $appointmentCost = $appointmentCost ?? \App\Models\RendezVous::DEFAULT_POINTS_COST;
+    $patientPoints = auth()->user()?->patient?->points;
+    $doctorCosts = ($doctorCosts ?? collect())->toArray();
+@endphp
 <div class="wrap">
     <div class="hero">
         <h1>Prendre un rendez-vous</h1>
@@ -55,7 +60,7 @@
                 <select id="medecin_id" name="medecin_id">
                     <option value="">Choisir un medecin</option>
                     @foreach ($medecins as $medecin)
-                        <option value="{{ $medecin->id }}" @selected(old('medecin_id') == $medecin->id)>
+                        <option value="{{ $medecin->id }}" data-points-cost="{{ $doctorCosts[$medecin->id] ?? \App\Models\RendezVous::DEFAULT_POINTS_COST }}" @selected(old('medecin_id', request('medecin_id')) == $medecin->id)>
                             Dr. {{ $medecin->user?->prenom }} {{ $medecin->user?->nom }} - {{ $medecin->specialite }}
                         </option>
                     @endforeach
@@ -73,8 +78,16 @@
                 </div>
             </div>
 
+            <div class="field">
+                <label for="points_cost">Points utilises pour ce rendez-vous</label>
+                <input id="points_cost" type="number" value="{{ $appointmentCost }}" readonly>
+            </div>
+
             <div class="doctor-card">
-                Le rendez-vous sera cree avec le statut <strong>en attente</strong>. Un medecin pourra ensuite le confirmer ou le modifier.
+                Ce rendez-vous utilise <strong id="pointsCostText">{{ $appointmentCost }} points</strong>. Les points seront depenses seulement apres la confirmation du medecin.
+                @if (! is_null($patientPoints))
+                    <br>Solde actuel : <strong>{{ $patientPoints }} points</strong>.
+                @endif
             </div>
 
             <div class="actions">
@@ -84,5 +97,18 @@
         </form>
     </div>
 </div>
+<script>
+    const medecinSelect = document.getElementById('medecin_id');
+    const pointsCostInput = document.getElementById('points_cost');
+    const pointsCostText = document.getElementById('pointsCostText');
+
+    medecinSelect?.addEventListener('change', () => {
+        const selectedOption = medecinSelect.options[medecinSelect.selectedIndex];
+        const pointsCost = selectedOption?.dataset.pointsCost || '{{ \App\Models\RendezVous::DEFAULT_POINTS_COST }}';
+
+        pointsCostInput.value = pointsCost;
+        pointsCostText.textContent = `${pointsCost} points`;
+    });
+</script>
 </body>
 </html>

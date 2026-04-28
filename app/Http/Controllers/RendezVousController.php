@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\RendezVousConfirmedMail;
 use App\Models\Medecin;
 use App\Models\Patient;
 use App\Models\RendezVous;
@@ -10,7 +9,6 @@ use App\Models\TransactionPoint;
 use App\Repositories\Contracts\RendezVousRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 
 class RendezVousController extends Controller
@@ -58,31 +56,6 @@ class RendezVousController extends Controller
 
         $medecin->increment('points', max(1, $pointsToAward));
         $rendezVous->update(['medecin_points_awarded' => true]);
-    }
-
-    private function sendConfirmationEmailIfEligible($rendezVous, ?string $previousStatus = null): void
-    {
-        if (! in_array($rendezVous->statut, ['confirme', 'confirmé'], true)) {
-            return;
-        }
-
-        if (in_array($previousStatus, ['confirme', 'confirmé'], true)) {
-            return;
-        }
-
-        $rendezVous->loadMissing(['patient.user', 'medecin.user']);
-
-        $patientEmail = $rendezVous->patient?->user?->email;
-
-        if (! $patientEmail) {
-            return;
-        }
-
-        $lieu = $rendezVous->medecin?->user?->ville
-            ? 'Cabinet du médecin - ' . $rendezVous->medecin->user->ville
-            : 'Lieu à confirmer par le médecin';
-
-        Mail::to($patientEmail)->send(new RendezVousConfirmedMail($rendezVous, $lieu));
     }
 
     private function chargePatientPointsIfEligible($rendezVous): ?string
@@ -301,7 +274,6 @@ class RendezVousController extends Controller
         }
 
         $this->awardMedecinPointsIfEligible($rendezVous);
-        $this->sendConfirmationEmailIfEligible($rendezVous, $previousStatus);
 
         return redirect()->route('rendezvous.index')
                          ->with('success', 'Rendez-vous modifié');
@@ -338,7 +310,6 @@ class RendezVousController extends Controller
         }
 
         $this->awardMedecinPointsIfEligible($rendezVous);
-        $this->sendConfirmationEmailIfEligible($rendezVous, $previousStatus);
 
         return redirect()->route('dashboard')->with('success', 'Statut du rendez-vous mis a jour.');
     }
