@@ -46,11 +46,7 @@
 
     <nav class="flex items-center justify-between bg-[#051F20] px-6 py-4 lg:px-14">
         <a href="{{ url('/') }}" class="flex items-center gap-3">
-            <span class="flex h-9 w-9 items-center justify-center rounded-[9px] bg-[#235347]">
-                <svg viewBox="0 0 24 24" class="h-[18px] w-[18px] fill-[#DAF1DE]" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
-                </svg>
-            </span>
+            
             <span class="font-['Playfair_Display'] text-[1.2rem] font-bold text-white">
                 Second<span class="text-[#8EB69B]">Chance</span>
             </span>
@@ -321,11 +317,6 @@
                             @enderror
                         </div>
 
-                        <div class="mb-5 rounded-xl border-2 border-dashed border-[#D9E8E0] bg-[#F4F7F5] px-6 py-8 text-center transition hover:border-[#235347] hover:bg-[#DAF1DE]">
-                            <div class="mb-2 flex justify-center">{!! $documentIcon !!}</div>
-                            <p class="text-sm font-medium text-[#3A5A52]">Glisser votre document ici</p>
-                            <p class="mt-1 text-xs text-[#7A9E93]">PDF, JPG, PNG · Max 5MB</p>
-                        </div>
 
                         <div class="mb-5">
                             <label class="mb-2 block text-sm font-semibold text-[#0D1F1E]">Biographie professionnelle</label>
@@ -355,11 +346,6 @@
                             <textarea name="association_description" rows="4" class="w-full rounded-[10px] border border-[#D9E8E0] px-4 py-3 text-sm outline-none transition focus:border-[#8EB69B] focus:ring-4 focus:ring-[#8EB69B]/20" placeholder="Decrivez vos missions et activites principales...">{{ old('association_description') }}</textarea>
                         </div>
 
-                        <div class="mb-5 rounded-xl border-2 border-dashed border-[#D9E8E0] bg-[#F4F7F5] px-6 py-8 text-center transition hover:border-[#235347] hover:bg-[#DAF1DE]">
-                            <div class="mb-2 flex justify-center">{!! $clipboardIcon !!}</div>
-                            <p class="text-sm font-medium text-[#3A5A52]">Deposer le recepisse officiel</p>
-                            <p class="mt-1 text-xs text-[#7A9E93]">PDF, JPG, PNG · Max 5MB</p>
-                        </div>
                     </div>
 
                     <div class="mt-7 flex items-center justify-between gap-4">

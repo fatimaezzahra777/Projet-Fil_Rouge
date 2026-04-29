@@ -45,7 +45,6 @@
     <div class="tabs">
         <button class="tab active" onclick="switchTab('info',this)">Informations</button>
         <button class="tab" onclick="switchTab('history',this)">Historique</button>
-        <button class="tab" onclick="switchTab('docs',this)">Documents</button>
         <button class="tab" onclick="switchTab('health',this)">Sante</button>
     </div>
 
